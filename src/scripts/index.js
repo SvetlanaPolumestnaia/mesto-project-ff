@@ -14,9 +14,7 @@ function createCard(link, name, alt, deleteFn) {
     const deleteButton = cardElement.querySelector('.card__delete-button');
     deleteButton.addEventListener('click', deleteFn); 
 
-   
    // handleModal('.card__image', '.popup_type_image')
-  
 
     return cardElement;
 };
@@ -35,63 +33,68 @@ initialCards.forEach((cards) => {
 });
 
 
-// Открытие и закрытие модальных окон
 
-function handleModal(btnForOpen, modal) {
-    const btn = document.querySelector(btnForOpen);
-    const mdl = document.querySelector(modal);
+// Функция открытия модального окна
+function openModal (modalForOpen, buttonForOpen) {
+    const modalOpen = document.querySelector(modalForOpen);
+    const button = document.querySelector(buttonForOpen);
+        
+    button.addEventListener('click', function() {
+        modalOpen.classList.add('popup_is-opened');
+        modalOpen.classList.add('popup_is-animated');
+    })
+}
 
-    function closeModal(evt) {
-        const target = evt.target;
+// Вызов открытия модальных окон редактирования и добавления карточки
+openModal('.popup_type_edit', '.profile__edit-button');
+openModal('.popup_type_new-card', '.profile__add-button');
 
+
+// Функция закрытия модального окна
+function closeModal(modalForClose) {
+    const modalClose = document.querySelector(modalForClose);
+    
+    function handleTarget(evt) {
+        const target = evt.target;  
         if (
-            target === mdl ||
+            target === modalClose ||
             target.closest('.popup__close') ||
             evt.code === 'Escape') {
-                mdl.classList.remove('popup_is-opened');
-            }
+                modalClose.classList.remove('popup_is-opened');
+        }
     }
 
-    function openModal() {
-        mdl.classList.add('popup_is-opened');  
-        mdl.classList.add('popup_is-animated');
-        
-    }
-
-    btn.addEventListener('click', openModal);
-    mdl.addEventListener('click', closeModal)
-    window.addEventListener('keydown', closeModal);
+    modalClose.addEventListener('click', handleTarget);
+    window.addEventListener('keydown', handleTarget);
 }
 
-
-// Вызов функции открытия и закрытия модальных оконо для Редактирования и Добавления нового места
-handleModal('.profile__edit-button', '.popup_type_edit');
-handleModal('.profile__add-button', '.popup_type_new-card');
-
-
-// 
-const formElement = document.querySelector('.popup__form');
-
-const nameInput = formElement.querySelector('.popup__input_type_name');
-const jobInput = formElement.querySelector('.popup__input_type_description');
-
-const profileTitle = document.querySelector('.profile__title');
-const profileDescription = document.querySelector('.profile__description');
-
-nameInput.value = profileTitle.textContent;
-jobInput.value = profileDescription.textContent;
+// Вызов закрытия модальных окон редактирования и добавления карточки
+closeModal('.popup_type_edit');
+closeModal('.popup_type_new-card');
 
 
-function handleFormSubmit(evt) {
-    evt.preventDefault(); 
+// const formElement = document.querySelector('.popup__form');
 
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
+// const nameInput = formElement.querySelector('.popup__input_type_name');
+// const jobInput = formElement.querySelector('.popup__input_type_description');
 
-    handleModal('.popup__button', '.popup_type_edit');
-}
+// const profileTitle = document.querySelector('.profile__title');
+// const profileDescription = document.querySelector('.profile__description');
 
-formElement.addEventListener('submit', handleFormSubmit); 
+// nameInput.value = profileTitle.textContent;
+// jobInput.value = profileDescription.textContent;
+
+
+// function handleFormSubmit(evt) {
+//     evt.preventDefault(); 
+
+//     profileTitle.textContent = nameInput.value;
+//     profileDescription.textContent = jobInput.value;
+
+//     handleModal('.popup__button', '.popup_type_edit');
+// }
+
+// formElement.addEventListener('submit', handleFormSubmit); 
  
 
 

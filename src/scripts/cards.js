@@ -26,3 +26,11 @@ const initialCards = [
 ];
 
 export { initialCards };
+
+const config = {
+  buttonForOpenEdit: '.profile__edit-button',
+  modalEdit: '.popup_type_edit',
+  buttonForOpenNewCard: '.profile__add-button',
+  modalAdd: '.popup_type_new-card',
+
+}
