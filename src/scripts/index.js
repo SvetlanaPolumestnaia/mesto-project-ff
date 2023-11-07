@@ -1,100 +1,64 @@
 import '../pages/index.css';
-import { initialCards } from './cards.js';
+import { initialCards, createCard, renderCard, deleteCard, likeCard } from './cards.js';
+import { openModalImage, closeModal } from './modal.js';
 
-const placesList = document.querySelector('.places__list');
-const cardTemplate = document.querySelector('#card-template').content;
+export const placesList = document.querySelector('.places__list');
+export const cardTemplate = document.querySelector('#card-template').content;
 
-function createCard(link, name, alt, deleteFn) { 
-    const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
-
-    cardElement.querySelector('.card__image').src = link;
-    cardElement.querySelector('.card__title').textContent = name;
-    cardElement.querySelector('.card__image').alt = alt;
-
-    const deleteButton = cardElement.querySelector('.card__delete-button');
-    deleteButton.addEventListener('click', deleteFn); 
-
-   // handleModal('.card__image', '.popup_type_image')
-
-    return cardElement;
-};
-
-function renderCard(cardData, container){
-    container.append(cardData);
-};
-
-function deleteCard(evt) {
-    const currentCard =evt.target;
-    currentCard.closest('.places__item').remove();
-};
-
+// Перебор для добавления изначальных карточек
 initialCards.forEach((cards) => {
-    renderCard(createCard(cards.link, cards.name, cards.name, deleteCard), placesList);
+    renderCard(createCard(cards.link, cards.name, cards.name, deleteCard, openModalImage, closeModal, likeCard), placesList);
 });
 
-
-
-// Функция открытия модального окна
-function openModal (modalForOpen, buttonForOpen) {
-    const modalOpen = document.querySelector(modalForOpen);
-    const button = document.querySelector(buttonForOpen);
-        
-    button.addEventListener('click', function() {
-        modalOpen.classList.add('popup_is-opened');
-        modalOpen.classList.add('popup_is-animated');
-    })
-}
-
-// Вызов открытия модальных окон редактирования и добавления карточки
-openModal('.popup_type_edit', '.profile__edit-button');
-openModal('.popup_type_new-card', '.profile__add-button');
-
-
-// Функция закрытия модального окна
-function closeModal(modalForClose) {
-    const modalClose = document.querySelector(modalForClose);
+// Функция редактирования профиля
+function editProfile() {
+    const popupEdit = document.querySelector('.popup_type_edit');
+    const formEdit = popupEdit.querySelector('.popup__form');
+    const nameInput = popupEdit.querySelector('.popup__input_type_name');
+    const jobInput = popupEdit.querySelector('.popup__input_type_description');
+    const profileTitle = document.querySelector('.profile__title');
+    const profileDescription = document.querySelector('.profile__description');
     
-    function handleTarget(evt) {
-        const target = evt.target;  
-        if (
-            target === modalClose ||
-            target.closest('.popup__close') ||
-            evt.code === 'Escape') {
-                modalClose.classList.remove('popup_is-opened');
-        }
-    }
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDescription.textContent;
 
-    modalClose.addEventListener('click', handleTarget);
-    window.addEventListener('keydown', handleTarget);
+        function handleFormSubmit(evt) {        
+            evt.preventDefault();
+            
+            profileTitle.textContent = nameInput.value;
+            profileDescription.textContent = jobInput.value;
+
+            formEdit.reset();
+
+            nameInput.value = profileTitle.textContent;
+            jobInput.value = profileDescription.textContent;
+        }
+
+    formEdit.addEventListener('submit', handleFormSubmit);
 }
 
-// Вызов закрытия модальных окон редактирования и добавления карточки
-closeModal('.popup_type_edit');
-closeModal('.popup_type_new-card');
+// Вызов функции редактирования профиля
+editProfile();
 
+// Функция добавления новой карточки пользователем
+function addNewCard() {
+    const popupNewCard = document.querySelector('.popup_type_new-card');
+    const formNewCard = popupNewCard.querySelector('.popup__form');
+    const placeNameInput = formNewCard.querySelector('.popup__input_type_card-name');
+    const UrlInput = formNewCard.querySelector('.popup__input_type_url');
+    
+    function handleFormNewCard(evt) {
+        evt.preventDefault();
 
-// const formElement = document.querySelector('.popup__form');
+        const newCardData = createCard(UrlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, openModalImage, closeModal, likeCard);
+        
+        placesList.prepend(newCardData);
 
-// const nameInput = formElement.querySelector('.popup__input_type_name');
-// const jobInput = formElement.querySelector('.popup__input_type_description');
+        formNewCard.reset();
+    };
 
-// const profileTitle = document.querySelector('.profile__title');
-// const profileDescription = document.querySelector('.profile__description');
+    formNewCard.addEventListener('submit', handleFormNewCard);
+}
 
-// nameInput.value = profileTitle.textContent;
-// jobInput.value = profileDescription.textContent;
-
-
-// function handleFormSubmit(evt) {
-//     evt.preventDefault(); 
-
-//     profileTitle.textContent = nameInput.value;
-//     profileDescription.textContent = jobInput.value;
-
-//     handleModal('.popup__button', '.popup_type_edit');
-// }
-
-// formElement.addEventListener('submit', handleFormSubmit); 
- 
-
-
+// Вызов функции добавления новой карточки пользователем
+addNewCard();
