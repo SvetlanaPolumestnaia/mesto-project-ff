@@ -1,50 +1,26 @@
-import { cardTemplate } from "./index.js";
-import { configurationImage } from "./configuration.js";
-
-export const initialCards = [
-    {
-      name: "Архыз",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
-    },
-    {
-      name: "Челябинская область",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/chelyabinsk-oblast.jpg",
-    },
-    {
-      name: "Иваново",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/ivanovo.jpg",
-    },
-    {
-      name: "Камчатка",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg",
-    },
-    {
-      name: "Холмогорский район",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kholmogorsky-rayon.jpg",
-    },
-    {
-      name: "Байкал",
-      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
-    },
-];
+import { cardTemplate, modalImage } from "./constants.js";
 
 // Функция создания новой карточки
-export function createCard(link, name, alt, deleteFn, openFn, closeFn, likeFn) { 
-  const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
+export function createCard(link, name, alt, deleteFn, openFn, likeFn) { 
+  const cardElementCopy = cardTemplate.querySelector('.places__item').cloneNode(true);
+  const cardElementImage = cardElementCopy.querySelector('.card__image');
+  const cardElementTitle = cardElementCopy.querySelector('.card__title');
+  const buttonDelete = cardElementCopy.querySelector('.card__delete-button');
+  const buttonImage = cardElementCopy.querySelector('.card__image');
+  
+  cardElementImage.src = link;
+  cardElementTitle.textContent = name;
+  cardElementImage.alt = alt;
 
-  cardElement.querySelector('.card__image').src = link;
-  cardElement.querySelector('.card__title').textContent = name;
-  cardElement.querySelector('.card__image').alt = alt;
+  buttonDelete.addEventListener('click', deleteFn);
 
-  const deleteButton = cardElement.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', deleteFn); 
+  // Не работает открытие как надо. Всегда открывается последняя добавленная карточка. 
+  // Если добавить новую карточку, то она и будет добавляться. В дефолтном виде всегда карточка Байкала
+  openFn(modalImage, buttonImage, link, name, alt);
 
-  openFn(link, name, alt, cardElement, configurationImage);
-  closeFn(configurationImage);
-
-  likeFn(cardElement);
-
-  return cardElement;
+  likeFn(cardElementCopy);
+  
+  return cardElementCopy;
 };
 
 // Функция добавления новой карточки на страницу

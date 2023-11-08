@@ -1,54 +1,40 @@
-import { configurationEdit, configurationNewCard } from "./configuration.js";
+import { modalEdit, buttonEdit, modalOpen, buttonOpen, modalImage, modalImageImg, modalImageCaption } from "./constants.js";
 
-// Функция открытия модального окна (редактирование и добавление новой карточки)
-export function openModal (config) {
-    const modalOpen = document.querySelector(config.modal);
-    const button = document.querySelector(config.buttonForOpen);
-        
+// Функция открытия модального окна
+export function openModal (modal, button, linkInOpenedModalImage, nameInOpenedModalImage, altInOpenedModalImage) {
+    modalImageImg.src = linkInOpenedModalImage;
+    modalImageCaption.textContent = nameInOpenedModalImage;
+    modalImageImg.alt = altInOpenedModalImage;
+    
+    modal.classList.add('popup_is-animated');
     button.addEventListener('click', function() {
-        modalOpen.classList.add('popup_is-opened');
-        modalOpen.classList.add('popup_is-animated');
+        modal.classList.add('popup_is-opened');
     })
 }
 
-// Вызов открытия модальных окон (редактирование и добавление новой карточки)
-openModal(configurationEdit);
-openModal(configurationNewCard);
-
-// Функция открытия модального окна (картинка)
-export function openModalImage (linkInOpenedModal, nameInOpenedModal, altInOpenedModal, searchAreaOpen, config) {
-    document.querySelector('.popup__image').src = linkInOpenedModal;
-    document.querySelector('.popup__caption').textContent = nameInOpenedModal;
-    document.querySelector('.popup__image').alt = altInOpenedModal;
-
-    const modalOpenImage = document.querySelector(config.modal);
-    const buttonImage = searchAreaOpen.querySelector(config.buttonForOpen);
-        
-    buttonImage.addEventListener('click', function() {
-        modalOpenImage.classList.add('popup_is-opened');
-        modalOpenImage.classList.add('popup_is-animated');
-    })
-}
+// Вызов функции открытия модальных окон (редактирование и добавление новой карточки)
+openModal(modalEdit, buttonEdit);
+openModal(modalOpen, buttonOpen);
 
 // Функция закрытия модального окна
-export function closeModal(config) {
-    const modalClose = document.querySelector(config.modal);
-    
+function closeModal(modal) {
     function handleTarget(evt) {
-        const target = evt.target;  
+        const target = evt.target;
         if (
-            target === modalClose ||
+            target === modal ||
             target.closest('.popup__close') ||
             target.closest('.popup__button') ||
-            evt.code === 'Escape') {
-                modalClose.classList.remove('popup_is-opened');             
+            // Доделать закрытие по кнопке(про удаление слушателя)
+            evt.code === 'Escape'
+        ) {
+            modal.classList.remove('popup_is-opened');
         }
     }
-
-    modalClose.addEventListener('click', handleTarget);
-    window.addEventListener('keydown', handleTarget);
+    modal.addEventListener('click', handleTarget);
+    window.addEventListener('keydown', handleTarget)
 }
 
-// Вызов функции закрытия модальных окон
-closeModal(configurationEdit);
-closeModal(configurationNewCard);
+// Вызов функции закрытия всех модальных окон
+closeModal(modalEdit);
+closeModal(modalOpen);
+closeModal(modalImage);
