@@ -1,5 +1,5 @@
 import '../pages/index.css';
-import { initialCards, placesList, formEdit, popupEdit, nameInput, jobInput, profileTitle, profileDescription } from './constants.js';
+import { initialCards, placesList, formEdit, nameInput, jobInput, profileTitle, profileDescription, formNewCard, placeNameInput, urlInput } from './constants.js';
 import { createCard, renderCard, deleteCard, likeCard } from './cards.js';
 import { openModal } from './modal.js';
 
@@ -30,10 +30,6 @@ function handleFormSubmit(evt) {
 formEdit.addEventListener('submit', handleFormSubmit);
 
 // Функция добавления новой карточки пользователем
-const popupNewCard = document.querySelector('.popup_type_new-card');
-const formNewCard = popupNewCard.querySelector('.popup__form');
-const placeNameInput = formNewCard.querySelector('.popup__input_type_card-name');
-const urlInput = formNewCard.querySelector('.popup__input_type_url');
 
 function handleFormNewCard(evt) {
     evt.preventDefault();

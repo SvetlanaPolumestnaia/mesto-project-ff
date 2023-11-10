@@ -1,4 +1,4 @@
-import { cardTemplate, modalImage } from "./constants.js";
+import { cardTemplate } from "./constants.js";
 
 // Функция создания новой карточки
 export function createCard(link, name, alt, deleteFn, openFn, likeFn) { 
@@ -14,10 +14,8 @@ export function createCard(link, name, alt, deleteFn, openFn, likeFn) {
 
   buttonDelete.addEventListener('click', deleteFn);
 
-  // Не работает открытие как надо. Всегда открывается последняя добавленная карточка. 
-  // Если добавить новую карточку, то она и будет добавляться. В дефолтном виде всегда карточка Байкала
-  openFn(modalImage, buttonImage, link, name, alt);
-
+  buttonImage.addEventListener('click', openFn)
+  
   likeFn(cardElementCopy);
   
   return cardElementCopy;
