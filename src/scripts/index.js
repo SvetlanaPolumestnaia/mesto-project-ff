@@ -5,10 +5,13 @@ import { modals,
          modalImage,
          modalImageImg,
          modalImageCaption,
-         buttonEditProfile, 
-         buttonAddNewCard, 
-         buttonsCloseModal, 
-         buttonsSave, 
+         buttonCloseImage,
+         buttonEditProfile,
+         buttonSaveEditProfile,
+         buttonCloseEditProfile,
+         buttonAddNewCard,
+         buttonSaveAddNewCard,
+         buttonCloseAddNewCard,
          initialCards, 
          placesList, 
          formEditProfile, 
@@ -45,9 +48,6 @@ function handleFormEditProfile(evt) {
     
     profileTitle.textContent = nameInput.value;
     profileDescription.textContent = jobInput.value;
-
-    nameInput.value = profileTitle.textContent;
-    jobInput.value = profileDescription.textContent;
 }
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
@@ -93,22 +93,26 @@ buttonAddNewCard.addEventListener('click', () => {
 
 // Закрытие модальных окон
 // По крестику
-buttonsCloseModal.forEach((buttonClose) => {
-    buttonClose.addEventListener('click', () => {
-        modals.forEach((modal) => {
-            closeModal(modal);
-        })
-    })
-})
+buttonCloseEditProfile.addEventListener('click', () => {
+    closeModal(modalEditProfile);
+});
+
+buttonCloseAddNewCard.addEventListener('click', () => {
+    closeModal(modalAddNewCard);
+});
+
+buttonCloseImage.addEventListener('click', () => {
+    closeModal(modalImage);
+});
 
 // По кнопке Сохранить
-buttonsSave.forEach((buttonSave) => {
-    buttonSave.addEventListener('click', () => {
-        modals.forEach((modal) => {
-            closeModal(modal);
-        })
-    })
-})
+buttonSaveEditProfile.addEventListener('click', () => {
+    closeModal(modalEditProfile);
+});
+
+buttonSaveAddNewCard.addEventListener('click', () => {
+    closeModal(modalAddNewCard);
+});
 
 // По оверлею
 modals.forEach((modal) => {

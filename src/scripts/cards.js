@@ -7,6 +7,7 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn) {
   const cardElementTitle = cardElementCopy.querySelector('.card__title');
   const buttonDeleteCard = cardElementCopy.querySelector('.card__delete-button');
   const buttonImage = cardElementCopy.querySelector('.card__image');
+  const buttonLikeCard = cardElementCopy.querySelector('.card__like-button');
   
   cardElementImage.src = link;
   cardElementTitle.textContent = name;
@@ -14,7 +15,7 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn) {
 
   buttonDeleteCard.addEventListener('click', deleteFn);
 
-  likeFn(cardElementCopy);
+  buttonLikeCard.addEventListener('click', likeFn);
 
   buttonImage.addEventListener('click', openFn)
 
@@ -27,9 +28,6 @@ export function deleteCard(evt) {
 };
 
 // Функция лайка
-export function likeCard(searchAreaLike) {
-  const buttonLike = searchAreaLike.querySelector('.card__like-button');
-  buttonLike.addEventListener('click', function() {
-      buttonLike.classList.toggle('card__like-button_is-active');
-  })
+export function likeCard(evt) {
+  evt.target.closest('.card__like-button').classList.toggle('card__like-button_is-active');
 }

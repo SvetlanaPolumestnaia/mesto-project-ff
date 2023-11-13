@@ -5,13 +5,16 @@ export const modals = Array.from(document.querySelectorAll('.popup'));
 export const modalEditProfile = document.querySelector('.popup_type_edit');
 export const modalAddNewCard = document.querySelector('.popup_type_new-card');
 export const buttonEditProfile = document.querySelector('.profile__edit-button');
+export const buttonSaveEditProfile = modalEditProfile.querySelector('.popup__button');
+export const buttonCloseEditProfile = modalEditProfile.querySelector('.popup__close');
 export const buttonAddNewCard = document.querySelector('.profile__add-button');
-export const buttonsCloseModal = Array.from(document.querySelectorAll('.popup__close'));
-export const buttonsSave = Array.from(document.querySelectorAll('.popup__button'));
+export const buttonSaveAddNewCard = modalAddNewCard.querySelector('.popup__button');
+export const buttonCloseAddNewCard = modalAddNewCard.querySelector('.popup__close');
 export const modalImage = document.querySelector('.popup_type_image');
 export const modalImageImg = document.querySelector('.popup__image');
 export const modalImageCaption = document.querySelector('.popup__caption');
 
+export const buttonCloseImage = modalImage.querySelector('.popup__close');
 export const popupEditProfile = document.querySelector('.popup_type_edit');
 export const formEditProfile = popupEditProfile.querySelector('.popup__form');
 export const nameInput = popupEditProfile.querySelector('.popup__input_type_name');
@@ -49,4 +52,3 @@ export const initialCards = [
       link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
     },
 ];
-
