@@ -62,5 +62,8 @@ export function enableValidation(validationConfig) {
     });
 }
 
-
-// Написать функцию clearValidation
+export function clearValidation(formElement, inputElement, validationConfig) {
+    const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
+    buttonElement.classList.remove(validationConfig.inactiveButtonClass);
+    hideInputError(formElement, inputElement, validationConfig);
+}

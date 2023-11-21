@@ -28,7 +28,7 @@ import { createCard,
          likeCard } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
-import { enableValidation, hideInputError } from './validation.js';
+import { enableValidation, clearValidation } from './validation.js';
 
 // Функция добавления новой карточки на страницу
 function renderCard(cardData, container) {
@@ -48,16 +48,19 @@ jobInput.value = profileDescription.textContent;
 function handleFormEditProfile(evt) {        
     evt.preventDefault();
 
-// Пока нет функции ClearValidation. Это неправильно, надо переписать 
-    nameInput.value = profileTitle.textContent;
-    jobInput.value = profileDescription.textContent;
-    hideInputError(formEditProfile, nameInput, validationConfiguration);
-    hideInputError(formEditProfile, jobInput, validationConfiguration);
+    buttonEditProfile.addEventListener('click', () => {
+        nameInput.value = profileTitle.textContent;
+        jobInput.value = profileDescription.textContent;
+    })
 
     if (nameInput.validity.valid && jobInput.validity.valid) {
         profileTitle.textContent = nameInput.value;
         profileDescription.textContent = jobInput.value;
     }
+
+    clearValidation(formEditProfile, nameInput, validationConfiguration);
+    clearValidation(formEditProfile, jobInput, validationConfiguration);
+
 }
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
@@ -66,14 +69,14 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
 
-// Пока нет функции ClearValidation. Это неправильно, надо переписать 
-    hideInputError(formNewCard, placeNameInput, validationConfiguration);
-    hideInputError(formNewCard, urlInput, validationConfiguration);
-
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
         const newCardData = createCard(urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage);
         placesList.prepend(newCardData);
     }
+    
+    clearValidation(formNewCard, placeNameInput, validationConfiguration);
+    clearValidation(formNewCard, urlInput, validationConfiguration);
+
     formNewCard.reset();
 };
 
@@ -147,4 +150,3 @@ export function handleEsc(evt) {
 // Валидация
   
 enableValidation(validationConfiguration);
-
