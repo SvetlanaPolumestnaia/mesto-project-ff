@@ -22,23 +22,22 @@ import { modals,
          formNewCard, 
          placeNameInput, 
          urlInput, 
-         validationConfiguration} from './constants.js';
+         validationConfiguration,
+         apiConfiguration} from './constants.js';
 import { createCard, 
          deleteCard, 
          likeCard } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
-import { enableValidation, clearValidation } from './validation.js';
+import { enableValidation, 
+         clearValidation } from './validation.js';
+import { changeProfileData,
+         getInitialCards } from './api.js';
 
 // Функция добавления новой карточки на страницу
-function renderCard(cardData, container) {
+export function renderCard(cardData, container) {
     container.append(cardData);
   };
-
-// Перебор для добавления изначальных карточек
-initialCards.forEach((cards) => {
-    renderCard(createCard(cards.link, cards.name, cards.name, deleteCard, likeCard, openModalImage), placesList);
-});
 
 // Чтобы по умолчанию при открытии окна редактирования подставлялись значения из профайла
 nameInput.value = profileTitle.textContent;
@@ -69,6 +68,8 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
 
+    addCard(placeNameInput.value, urlInput.value);
+
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
         const newCardData = createCard(urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage);
         placesList.prepend(newCardData);
@@ -84,7 +85,7 @@ formNewCard.addEventListener('submit', handleFormAddNewCard);
 
 // Работа с открытием и закрытием модульных окон
 // Открытие модульного окна с картинкой
-function openModalImage(evt) {
+export function openModalImage(evt) {
     evt.preventDefault();
     modalImageImg.src = evt.target.src;
     modalImageCaption.textContent = evt.target.alt;
@@ -150,3 +151,54 @@ export function handleEsc(evt) {
 // Валидация
   
 enableValidation(validationConfiguration);
+
+// API
+// Изменение данных пользователя (меня)
+
+changeProfileData(apiConfiguration);
+
+// Добавление карточек на страницу
+
+
+getInitialCards(apiConfiguration);
+
+export const token = 'a3a5f573-877f-4323-8cbf-b12cc816b747'
+
+//Добавление новой карточки
+function addCard(cardName, cardLink) {
+    return fetch('https://nomoreparties.co/v1/wff-cohort-1/cards', {
+        method: 'POST',
+        headers: {
+            authorization: token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: cardName,
+            link: cardLink
+        })
+    })
+}
+
+
+// Количество лайков
+// export function getLikes(container) {
+//     return fetch('https://nomoreparties.co/v1/wff-cohort-1/cards', {
+//         headers: {
+//             authorization: 'a3a5f573-877f-4323-8cbf-b12cc816b747'
+//         }
+//         })
+//         .then(res => res.json())
+//         .then(cards => {
+//             cards.forEach(card => {
+//                 //console.log(card, card.likes.length);
+//                 container.textContent = card.likes.length;
+//             })
+//         })
+// };
+
+//getLikes();
+
+
+import { imgId } from './api.js';
+//imgId()
+import { myId } from './constants.js';
