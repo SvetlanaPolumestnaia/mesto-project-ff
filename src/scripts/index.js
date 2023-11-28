@@ -12,7 +12,6 @@ import { modals,
          buttonAddNewCard,
          buttonSaveAddNewCard,
          buttonCloseAddNewCard,
-         initialCards, 
          placesList, 
          formEditProfile, 
          nameInput, 
@@ -32,34 +31,23 @@ import { openModal,
 import { enableValidation, 
          clearValidation } from './validation.js';
 import { changeProfileData,
-         getInitialCards } from './api.js';
+         addCard, 
+         getLikeQuantity,
+         getInitialCards,
+         getCardIds} from './api.js';
 
 // Функция добавления новой карточки на страницу
 export function renderCard(cardData, container) {
     container.append(cardData);
   };
 
-// Чтобы по умолчанию при открытии окна редактирования подставлялись значения из профайла
-nameInput.value = profileTitle.textContent;
-jobInput.value = profileDescription.textContent;
-
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
     evt.preventDefault();
-
-    buttonEditProfile.addEventListener('click', () => {
-        nameInput.value = profileTitle.textContent;
-        jobInput.value = profileDescription.textContent;
-    })
-
     if (nameInput.validity.valid && jobInput.validity.valid) {
         profileTitle.textContent = nameInput.value;
         profileDescription.textContent = jobInput.value;
     }
-
-    clearValidation(formEditProfile, nameInput, validationConfiguration);
-    clearValidation(formEditProfile, jobInput, validationConfiguration);
-
 }
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
@@ -67,18 +55,11 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 // Добавление новой карточки пользователем
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
-
-    addCard(placeNameInput.value, urlInput.value);
-
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
         const newCardData = createCard(urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage);
         placesList.prepend(newCardData);
+        addCard(placeNameInput.value, urlInput.value, apiConfiguration);
     }
-    
-    clearValidation(formNewCard, placeNameInput, validationConfiguration);
-    clearValidation(formNewCard, urlInput, validationConfiguration);
-
-    formNewCard.reset();
 };
 
 formNewCard.addEventListener('submit', handleFormAddNewCard);
@@ -103,10 +84,15 @@ modals.forEach((modal) => {
 // Открытие модальных окон по кнопкам
 buttonEditProfile.addEventListener('click', () => {
     openModal(modalEditProfile);
+    clearValidation(modalEditProfile, validationConfiguration);
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDescription.textContent;
 });
 
 buttonAddNewCard.addEventListener('click', () => {
     openModal(modalAddNewCard);
+    clearValidation(modalAddNewCard, validationConfiguration);
+    formNewCard.reset();
 });
 
 // Закрытие модальных окон
@@ -154,51 +140,10 @@ enableValidation(validationConfiguration);
 
 // API
 // Изменение данных пользователя (меня)
-
 changeProfileData(apiConfiguration);
-
-// Добавление карточек на страницу
-
 
 getInitialCards(apiConfiguration);
 
-export const token = 'a3a5f573-877f-4323-8cbf-b12cc816b747'
+export const cardIds = getCardIds(apiConfiguration)
 
-//Добавление новой карточки
-function addCard(cardName, cardLink) {
-    return fetch('https://nomoreparties.co/v1/wff-cohort-1/cards', {
-        method: 'POST',
-        headers: {
-            authorization: token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: cardName,
-            link: cardLink
-        })
-    })
-}
-
-
-// Количество лайков
-// export function getLikes(container) {
-//     return fetch('https://nomoreparties.co/v1/wff-cohort-1/cards', {
-//         headers: {
-//             authorization: 'a3a5f573-877f-4323-8cbf-b12cc816b747'
-//         }
-//         })
-//         .then(res => res.json())
-//         .then(cards => {
-//             cards.forEach(card => {
-//                 //console.log(card, card.likes.length);
-//                 container.textContent = card.likes.length;
-//             })
-//         })
-// };
-
-//getLikes();
-
-
-import { imgId } from './api.js';
-//imgId()
-import { myId } from './constants.js';
+console.log(cardIds)

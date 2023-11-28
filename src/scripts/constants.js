@@ -63,10 +63,6 @@ export const validationConfiguration = {
 }
 
 export const myId = 'f19ca1805b28867f6c3451ec';
-export const headers = {
-  authorization: 'a3a5f573-877f-4323-8cbf-b12cc816b747',
-}
-
 
 export const apiConfiguration = {
   myId: 'f19ca1805b28867f6c3451ec',
@@ -74,6 +70,6 @@ export const apiConfiguration = {
   baseUrl: 'https://nomoreparties.co/v1/wff-cohort-1',
   uriCards: '/cards',
   uriUsers: '/users',
-  uriMe: '/me'
-
+  uriMe: '/me',
+  likeClass: 'card__like-button_likes'
 }

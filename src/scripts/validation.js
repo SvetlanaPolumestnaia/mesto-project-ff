@@ -62,8 +62,12 @@ export function enableValidation(validationConfig) {
     });
 }
 
-export function clearValidation(formElement, inputElement, validationConfig) {
+export function clearValidation(formElement, validationConfig) {
     const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
+    const inputElements = formElement.querySelectorAll(validationConfig.inputSelector);
     buttonElement.classList.remove(validationConfig.inactiveButtonClass);
-    hideInputError(formElement, inputElement, validationConfig);
+    inputElements.forEach((inputElement) => {
+        hideInputError(formElement, inputElement, validationConfig);
+    });
+
 }

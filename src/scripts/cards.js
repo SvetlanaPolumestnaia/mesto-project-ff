@@ -1,11 +1,11 @@
 import { cardTemplate, myId } from "./constants.js";
-import { imgId } from "./api.js";
+import { getLikeQuantity } from "./api.js";
+import { apiConfiguration } from "./constants.js";
+import { getLike, imgId } from "./api.js";
 import { token } from "./index.js";
 import { getLikes } from "./index.js";
 
 // Функция создания новой карточки
-
-
 export function createCard(link, name, alt, deleteFn, likeFn, openFn) { 
   const cardElementCopy = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardElementImage = cardElementCopy.querySelector('.card__image');
@@ -17,19 +17,11 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn) {
   cardElementImage.src = link;
   cardElementTitle.textContent = name;
   cardElementImage.alt = alt;
-  //imgId()
-  // const imgIds = imgId();
-  // cardElementCopy.id = imgIds;
-  // console.log(imgIds)
-  // if (myId === imgIds) {
-  //   buttonDeleteCard.classList.add('card__delete-button_visible');
-  //   buttonDeleteCard.addEventListener('click', deleteFn);
-  // }
 
   buttonDeleteCard.addEventListener('click', deleteFn);
   buttonLikeCard.addEventListener('click', likeFn);
 
-  //getLikes(buttonLikeCardQuantity);
+  getLikeQuantity(apiConfiguration, buttonLikeCardQuantity)
 
   buttonImage.addEventListener('click', openFn);
   return cardElementCopy;
@@ -43,6 +35,5 @@ export function deleteCard(evt) {
 // Функция лайка
 export function likeCard(evt) {
   evt.target.closest('.card__like-button').classList.toggle('card__like-button_is-active');
-  //getLikes(evt);
 }
 
