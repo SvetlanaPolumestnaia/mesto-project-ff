@@ -25,21 +25,48 @@ import { modals,
          apiConfiguration} from './constants.js';
 import { createCard, 
          deleteCard, 
-         likeCard } from './cards.js';
+         likeCard,
+         getLikesQuantity } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
 import { enableValidation, 
          clearValidation } from './validation.js';
 import { changeProfileData,
          addCard, 
-         getLikeQuantity,
-         getInitialCards,
-         getCardIds} from './api.js';
+         getInitialCards, 
+         deleteCardFromServer,
+         deleteMyCard} from './api.js';
 
 // Функция добавления новой карточки на страницу
-export function renderCard(cardData, container) {
+function renderCard(cardData, container) {
     container.append(cardData);
   };
+
+// Добавление существующих на сервере карточек
+getInitialCards(apiConfiguration)
+    .then((results) => {
+        const cards = results[1];
+        cards.forEach((card) => {
+export function deleteMyCard(cardId, apiConfig) {
+            const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage);
+            renderCard(newCard, placesList);
+            
+            newCard.id = card._id;
+            newCard.dataset.likes = card.likes.length;
+            newCard.dataset.ownerId = card.owner._id;
+            
+            getLikesQuantity(newCard);
+
+            console.log(newCard)
+            //showDeleteButton(newCard, apiConfiguration);
+
+            //deleteCardFromServer(newCard, newCard.id, apiConfiguration);
+            deleteCardFromServer(newCard, deleteCard, apiConfiguration);
+            
+        });
+    })
+
+//handleCards();
 
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
@@ -143,7 +170,3 @@ enableValidation(validationConfiguration);
 changeProfileData(apiConfiguration);
 
 getInitialCards(apiConfiguration);
-
-export const cardIds = getCardIds(apiConfiguration)
-
-console.log(cardIds)

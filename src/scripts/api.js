@@ -1,6 +1,4 @@
-import { renderCard, openModalImage, cardIds } from './index.js';
-import { createCard, deleteCard, likeCard } from './cards.js';
-import { placesList, apiConfiguration } from './constants.js';
+import { deleteCard } from "./cards";
 
 // Изменение данных профиля
 export function changeProfileData(apiConfig) {
@@ -38,21 +36,9 @@ export function getInitialCards(apiConfig) {
 
     const promises = [ usersList, cardsList ];
 
-    Promise.all(promises)
+    return Promise.all(promises)
         .then((results) => {
-            const cards = results[1];
-            cards.forEach((card) => {
-                renderCard(createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage), placesList);
-                
-                //console.log(card, card.likes.length);
-            });
-
-            const users = results[0];
-            users.forEach((user) => {
-                //console.log(user._id);
-                return user._id;
-            })
-
+                return results;
         })
 }
 
@@ -72,30 +58,44 @@ export function addCard(cardName, cardLink, apiConfig) {
     })
 }
 
-// Отображение количества лайков
-export function getLikeQuantity(apiConfig, button) {
-    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards;
-    return fetch(targetUrl, {
-        headers: {
-            authorization: apiConfig.token
-        }
-    })
-        .then( res => res.json())
-        .then( cards => {
+// Удаление карточки
 
+export function deleteCardFromServer(card, deleteFn1, deleteFn2, apiConfig) {
+    const deleteElement = card.querySelector('.card__delete-button');
+    if (card.dataset.ownerId === apiConfig.myId) {
+        deleteElement.classList.add('card__delete-button_visible');
+        deleteElement.addEventListener(('click'), deleteFn1);
+        deleteElement.addEventListener(('click'), () => {
+            deleteFn2()
+        });
+    }
+  }
 
-        })
+export function deleteMyCard(cardId, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + '/' + cardId;
+    console.log(targetUrl);
+    // return fetch(targetUrl, {
+    //     method: 'DELETE',
+    //     headers: {
+    //         authorization: apiConfig.token,
+    //         'Content-Type': 'application/json'
+    //     }
+    //     })
+    //     .then((res) => res.json())
+    //     .then((evt) => {
+    //         deleteCard(evt)
+    //     })
 }
 
-export function getCardIds(apiConfig) {
-    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards;
-    return fetch(targetUrl, {
-        headers: {
-            authorization: apiConfig.token
-        }
-    })
-        .then( res => res.json())
-        .then( cards => {
-            return cards._id
-        })
-}
+//   const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + '/' + cardId
+//             return fetch(targetUrl, {
+//                 method: 'DELETE',
+//                 headers: {
+//                     authorization: apiConfig.token,
+//                     'Content-Type': 'application/json'
+//                 }
+//                 })
+//                 .then((res) => res.json())
+//                 .then((evt) => {
+//                     deleteCard(evt)
+//                 })
