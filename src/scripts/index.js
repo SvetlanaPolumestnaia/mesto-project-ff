@@ -22,11 +22,13 @@ import { modals,
          placeNameInput, 
          urlInput, 
          validationConfiguration,
-         apiConfiguration} from './constants.js';
+         apiConfiguration,
+         cardTemplate} from './constants.js';
 import { createCard, 
          deleteCard, 
          likeCard,
-         getLikesQuantity } from './cards.js';
+         getLikesQuantity, 
+         showDeleteButton} from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
 import { enableValidation, 
@@ -47,26 +49,23 @@ getInitialCards(apiConfiguration)
     .then((results) => {
         const cards = results[1];
         cards.forEach((card) => {
-export function deleteMyCard(cardId, apiConfig) {
-            const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage);
+            const newCard = createCard(card.link, card.name, card.name, deleteCardFromServer, likeCard, openModalImage);
             renderCard(newCard, placesList);
-            
-            newCard.id = card._id;
-            newCard.dataset.likes = card.likes.length;
-            newCard.dataset.ownerId = card.owner._id;
-            
-            getLikesQuantity(newCard);
+        
+        newCard.id = card._id;
+        newCard.dataset.likes = card.likes.length;
+        newCard.dataset.ownerId = card.owner._id;
+    
+        getLikesQuantity(newCard);
 
-            console.log(newCard)
-            //showDeleteButton(newCard, apiConfiguration);
+        showDeleteButton(newCard, apiConfiguration);
 
-            //deleteCardFromServer(newCard, newCard.id, apiConfiguration);
-            deleteCardFromServer(newCard, deleteCard, apiConfiguration);
-            
-        });
-    })
+        //console.log(newCard)
+        //deleteCardFromServer(newCard, newCard.id, deleteCard, deleteMyCard, apiConfiguration);
 
-//handleCards();
+    });
+})
+
 
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
@@ -83,11 +82,10 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
-        const newCardData = createCard(urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage);
-        placesList.prepend(newCardData);
-        addCard(placeNameInput.value, urlInput.value, apiConfiguration);
+        addCard(placeNameInput.value, urlInput.value, deleteCardFromServer, likeCard, openModalImage, apiConfiguration)
     }
 };
+
 
 formNewCard.addEventListener('submit', handleFormAddNewCard);
 
@@ -169,4 +167,3 @@ enableValidation(validationConfiguration);
 // Изменение данных пользователя (меня)
 changeProfileData(apiConfiguration);
 
-getInitialCards(apiConfiguration);

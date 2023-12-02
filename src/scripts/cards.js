@@ -1,4 +1,5 @@
-import { cardTemplate } from "./constants.js";
+import { cardTemplate, apiConfiguration } from "./constants.js";
+import { deleteCardFromServer } from "./api.js";
 
 // Функция создания новой карточки
 export function createCard(link, name, alt, deleteFn, likeFn, openFn) { 
@@ -13,17 +14,23 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn) {
   cardElementTitle.textContent = name;
   cardElementImage.alt = alt;
 
-  buttonDeleteCard.addEventListener('click', deleteFn);
+  showDeleteButton(cardElementCopy, apiConfiguration);
+
+  buttonDeleteCard.addEventListener('click', (evt) => {
+    deleteFn(evt, apiConfiguration)
+  })
   buttonLikeCard.addEventListener('click', likeFn);
   buttonImage.addEventListener('click', openFn);
   
   return cardElementCopy;
 };
 
-// Функция удаления карточки
-export function deleteCard(evt) {
-  evt.target.closest('.places__item').remove();
-};
+export function showDeleteButton(card, apiConfig) {
+  const deleteElement = card.querySelector('.card__delete-button')
+  if (card.dataset.ownerId === apiConfig.myId) {
+    deleteElement.classList.add('card__delete-button_visible');
+  }
+}
 
 // Функция лайка
 export function likeCard(evt) {
