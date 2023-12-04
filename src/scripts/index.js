@@ -29,10 +29,10 @@ import { modals,
          formEditAvatar, 
          avatarInput,
          validationConfiguration,
-         apiConfiguration} from './constants.js';
+         apiConfiguration } from './constants.js';
 import { createCard, 
          handleLikes, 
-         showDeleteButton} from './cards.js';
+         showDeleteButton } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
 import { enableValidation, 
@@ -43,7 +43,7 @@ import { changeProfileData,
          deleteCardFromServer,
          toggleLikeCard,
          changeProfileAvatar,
-         handleProfileData} from './api.js';
+         handleProfileData } from './api.js';
 
 // Функция добавления новой карточки на страницу
 function renderCard(cardData, container) {
