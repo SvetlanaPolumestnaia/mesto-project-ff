@@ -97,11 +97,11 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 // Добавление новой карточки пользователем
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
-    buttonSaveNewCard.textContent = 'Сохранение...'
+    buttonSaveNewCard.textContent = 'Сохранение...';
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
         addCardToServer(placeNameInput.value, urlInput.value, deleteCardFromServer, toggleLikeCard, openModalImage, apiConfiguration)
     }
-    buttonSaveNewCard.textContent = 'Сохранить'
+    buttonSaveNewCard.textContent = 'Сохранить';
 };
 
 formNewCard.addEventListener('submit', handleFormAddNewCard);
@@ -109,7 +109,7 @@ formNewCard.addEventListener('submit', handleFormAddNewCard);
 // Изменение аватара
 function handleFromEditAvatar(evt) {
     evt.preventDefault();
-    buttonSaveAvatar.textContent = 'Сохранение...'
+    buttonSaveAvatar.textContent = 'Сохранение...';
     if (avatarInput.validity.valid) {
         changeProfileAvatar(avatarInput.value, apiConfiguration)
             .then(data => {
@@ -141,7 +141,7 @@ export function openModalImage(evt) {
 
 // Чтобы модальные окна плавно открывались
 modals.forEach((modal) => {
-    modal.classList.add('popup_is-animated')
+    modal.classList.add('popup_is-animated');
 })
 
 // Открытие модальных окон по кнопкам
