@@ -29,8 +29,7 @@ import { modals,
          formEditAvatar, 
          avatarInput,
          validationConfiguration,
-         apiConfiguration,
-         } from './constants.js';
+         apiConfiguration} from './constants.js';
 import { createCard, 
          handleLikes, 
          showDeleteButton} from './cards.js';
