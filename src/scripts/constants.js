@@ -1,6 +1,5 @@
 export const placesList = document.querySelector('.places__list');
 export const cardTemplate = document.querySelector('#card-template').content;
-
 export const modals = Array.from(document.querySelectorAll('.popup'));
 export const modalEditProfile = document.querySelector('.popup_type_edit');
 export const modalAddNewCard = document.querySelector('.popup_type_new-card');

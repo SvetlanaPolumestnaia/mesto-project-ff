@@ -1,4 +1,4 @@
-import { apiConfiguration, placesList } from "./constants";
+import { placesList } from "./constants";
 import { createCard, handleLikes, showDeleteButton } from "./cards";
 
 // Отображение текущих карточек
@@ -80,7 +80,7 @@ export function deleteCardFromServer(evt, apiConfig) {
             headers: apiConfig.headers
         })
             .catch(error => {
-                console.error('Ошибка при удалении карточки:', error)
+                console.error('Ошибка при удалении карточки:', error);
             })
     }
 }
@@ -116,7 +116,7 @@ export function toggleLikeCard(evt, apiConfig) {
                 } console.error('Ошибка при получении списка карточек с сервера:', error);
             })
             .then(data => {
-                handleLikes(cardToLike, data, apiConfig)  
+                handleLikes(cardToLike, data, apiConfig);
             })
     }
 }
