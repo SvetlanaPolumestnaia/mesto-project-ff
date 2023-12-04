@@ -74,7 +74,7 @@ handleProfileData(apiConfiguration)
     .then(data => {
         profileTitle.textContent = data.name;
         profileDescription.textContent = data.about;
-        profileAvatar.style.backgroundImage = `url('${data.avatar}')`
+        profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
     })
     .catch(error => {
         console.error('Ошибка при добавлении данных профиля с сервера:', error)
