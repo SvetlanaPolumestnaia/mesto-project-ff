@@ -2,32 +2,37 @@ import '../pages/index.css';
 import { modals, 
          modalEditProfile, 
          modalAddNewCard,
+         modalEditAvatar,
          modalImage,
          modalImageImg,
          modalImageCaption,
          buttonCloseImage,
          buttonEditProfile,
-         buttonSaveEditProfile,
-         buttonCloseEditProfile,
+         buttonSaveProfile,
+         buttonCloseProfile,
          buttonAddNewCard,
-         buttonSaveAddNewCard,
-         buttonCloseAddNewCard,
+         buttonSaveNewCard,
+         buttonCloseNewCard,
+         buttonEditAvatar,
+         buttonSaveAvatar,
+         buttonCloseAvatar,
          placesList, 
          formEditProfile, 
          nameInput, 
          jobInput, 
+         profileAvatar, 
          profileTitle, 
          profileDescription, 
          formNewCard, 
          placeNameInput, 
          urlInput, 
+         formEditAvatar, 
+         avatarInput,
          validationConfiguration,
          apiConfiguration,
-         cardTemplate} from './constants.js';
+         } from './constants.js';
 import { createCard, 
-         deleteCard, 
-         likeCard,
-         getLikesQuantity, 
+         getLikes, 
          showDeleteButton} from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
@@ -37,7 +42,9 @@ import { changeProfileData,
          addCard, 
          getInitialCards, 
          deleteCardFromServer,
-         deleteMyCard} from './api.js';
+         handleLike,
+         changeAvatarOnServer,
+         handleProfileData} from './api.js';
 
 // Функция добавления новой карточки на страницу
 function renderCard(cardData, container) {
@@ -48,29 +55,33 @@ function renderCard(cardData, container) {
 getInitialCards(apiConfiguration)
     .then((results) => {
         const cards = results[1];
-        cards.forEach((card) => {
-            const newCard = createCard(card.link, card.name, card.name, deleteCardFromServer, likeCard, openModalImage);
+        cards.forEach((data) => {
+            const newCard = createCard(data.link, data.name, data.name, deleteCardFromServer, handleLike, openModalImage);
             renderCard(newCard, placesList);
         
-        newCard.id = card._id;
-        newCard.dataset.likes = card.likes.length;
-        newCard.dataset.ownerId = card.owner._id;
-    
-        getLikesQuantity(newCard);
+            newCard.id = data._id;
+            newCard.dataset.likes = data.likes.length;
+            newCard.dataset.ownerId = data.owner._id;
+        
+            getLikes(newCard, data);
 
-        showDeleteButton(newCard, apiConfiguration);
-
-        //console.log(newCard)
-        //deleteCardFromServer(newCard, newCard.id, deleteCard, deleteMyCard, apiConfiguration);
-
+            showDeleteButton(newCard, apiConfiguration);
     });
 })
 
+// Отображение профиля
+handleProfileData(apiConfiguration)
+    .then(data => {
+        profileTitle.textContent = data.name;
+        profileDescription.textContent = data.about;
+        profileAvatar.style.backgroundImage = `url('${data.avatar}')`
+    })
 
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
     evt.preventDefault();
     if (nameInput.validity.valid && jobInput.validity.valid) {
+        changeProfileData(nameInput.value, jobInput.value, apiConfiguration)
         profileTitle.textContent = nameInput.value;
         profileDescription.textContent = jobInput.value;
     }
@@ -82,12 +93,27 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
-        addCard(placeNameInput.value, urlInput.value, deleteCardFromServer, likeCard, openModalImage, apiConfiguration)
+        addCard(placeNameInput.value, urlInput.value, deleteCardFromServer, handleLike, openModalImage, apiConfiguration)
     }
 };
 
 
 formNewCard.addEventListener('submit', handleFormAddNewCard);
+
+// Изменение аватара
+function handleFromEditAvatar(evt) {
+    evt.preventDefault();
+    if (avatarInput.validity.valid) {
+        changeAvatarOnServer(avatarInput.value, apiConfiguration)
+            .then(data => {
+                profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
+            })
+    }
+}
+
+formEditAvatar.addEventListener('submit', handleFromEditAvatar)
+
+
 
 // Работа с открытием и закрытием модульных окон
 // Открытие модульного окна с картинкой
@@ -120,28 +146,42 @@ buttonAddNewCard.addEventListener('click', () => {
     formNewCard.reset();
 });
 
+buttonEditAvatar.addEventListener('click', () => {
+    openModal(modalEditAvatar);
+    clearValidation(modalEditAvatar, validationConfiguration);
+    formEditAvatar.reset();
+})
+
 // Закрытие модальных окон
 // По крестику
-buttonCloseEditProfile.addEventListener('click', () => {
+buttonCloseProfile.addEventListener('click', () => {
     closeModal(modalEditProfile);
 });
 
-buttonCloseAddNewCard.addEventListener('click', () => {
+buttonCloseNewCard.addEventListener('click', () => {
     closeModal(modalAddNewCard);
 });
+
+buttonCloseAvatar.addEventListener('click', () => {
+    closeModal(modalEditAvatar);
+})
 
 buttonCloseImage.addEventListener('click', () => {
     closeModal(modalImage);
 });
 
 // По кнопке Сохранить
-buttonSaveEditProfile.addEventListener('click', () => {
+buttonSaveProfile.addEventListener('click', () => {
     closeModal(modalEditProfile);
 });
 
-buttonSaveAddNewCard.addEventListener('click', () => {
+buttonSaveNewCard.addEventListener('click', () => {
     closeModal(modalAddNewCard);
 });
+
+buttonSaveAvatar.addEventListener('click', () => {
+    closeModal(modalEditAvatar);
+})
 
 // По оверлею
 modals.forEach((modal) => {
@@ -162,8 +202,4 @@ export function handleEsc(evt) {
 // Валидация
   
 enableValidation(validationConfiguration);
-
-// API
-// Изменение данных пользователя (меня)
-changeProfileData(apiConfiguration);
 
