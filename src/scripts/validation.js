@@ -69,5 +69,4 @@ export function clearValidation(formElement, validationConfig) {
     inputElements.forEach((inputElement) => {
         hideInputError(formElement, inputElement, validationConfig);
     });
-
 }

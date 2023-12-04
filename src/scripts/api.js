@@ -1,23 +1,27 @@
-import { avatarInput, placesList } from "./constants";
-import { createCard, getLikes, showDeleteButton } from "./cards";
+import { apiConfiguration, placesList } from "./constants";
+import { createCard, handleLikes, showDeleteButton } from "./cards";
 
 // Отображение текущих карточек
 export function getInitialCards(apiConfig) {
     const targetUrlUsers = apiConfig.baseUrl + apiConfig.uriUsers;
     const usersList = fetch(targetUrlUsers, {
-        headers: {
-            authorization: apiConfig.token
-        }
+        headers: apiConfig.headers
         })
-    .then(res => res.json());
+        .then(res => {
+            if (res.ok) {
+              return res.json();
+            } console.error('Ошибка при получении списка пользователей с сервера:', error);
+        })      
 
     const targetUrlCards = apiConfig.baseUrl + apiConfig.uriCards;
     const cardsList = fetch(targetUrlCards, {
-        headers: {
-            authorization: apiConfig.token
-        }
+        headers: apiConfig.headers
     })
-    .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+            return res.json();
+            } console.error('Ошибка при получении списка карточек с сервера:', error);
+        })   
 
     const promises = [ usersList, cardsList ];
 
@@ -28,54 +32,61 @@ export function getInitialCards(apiConfig) {
         .catch(error => {
             console.error('Ошибка при добавлении карточек с сервера:', error);
         });
-}
+    }
 
 // Добавление новой карточки на сервер
-export function addCard(cardName, cardLink, deleteFn, handleLikeFn, openFn, apiConfig) {
+export function addCardToServer(cardName, cardLink, deleteFn, likeFn, openFn, apiConfig) {
     const targetUrl = apiConfig.baseUrl + apiConfig.uriCards
     fetch(targetUrl, {
         method: 'POST',
-        headers: {
-            authorization: apiConfig.token,
-            'Content-Type': 'application/json',
-        },
+        headers: apiConfig.headers,
         body: JSON.stringify({
             name: cardName,
             link: cardLink }),
     })
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok) {
+        return res.json();
+        } console.error('Ошибка при добавлении данных на сервер:', error);
+    })
     .then(data => {
-        const cardElement = createCard(cardLink, cardName, cardName, deleteFn, handleLikeFn, openFn);
+        const cardElement = createCard(cardLink, cardName, cardName, deleteFn, likeFn, openFn);
+        placesList.prepend(cardElement);
+
+        //Добавление серверных данных в дата-атрибуты
         cardElement.id = data._id;
         cardElement.dataset.likes = data.likes.length;
         cardElement.dataset.ownerId = data.owner._id;
+
+        // Чтобы при добавлении новой карточки показывалась кнопка удаления
         showDeleteButton(cardElement, apiConfig);
-        getLikes(cardElement, data)
-        placesList.prepend(cardElement);
+        // Чтобы при добавлении новой карточки показывалось количество лайков
+        handleLikes(cardElement, data, apiConfig);
     })
     .catch(error => {
         console.error('Ошибка при создании карточки:', error);
     });
 }
 
-// Удаление карточки
+// Удаление своей карточки с сервера
 export function deleteCardFromServer(evt, apiConfig) {
     const cardToDelete = evt.target.closest('.places__item');
+
     if (cardToDelete.dataset.ownerId === apiConfig.myId) {
         cardToDelete.remove();
         const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + '/' + cardToDelete.id;
         return fetch(targetUrl, {
             method: 'DELETE',
-            headers: {
-                authorization: apiConfig.token,
-                'Content-Type': 'application/json'
-            }
+            headers: apiConfig.headers
         })
+            .catch(error => {
+                console.error('Ошибка при удалении карточки:', error)
+            })
     }
 }
 
 // Добавление, удаление лайков
-export function handleLike(evt, apiConfig) {
+export function toggleLikeCard(evt, apiConfig) {
     const buttonLike = evt.target.closest('.card__like-button');
     const cardToLike = buttonLike.closest('.places__item');
     const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + apiConfig.uriLikes + '/' + cardToLike.id;
@@ -83,46 +94,47 @@ export function handleLike(evt, apiConfig) {
     if (!buttonLike.classList.contains('card__like-button_is-active')) {
         return fetch(targetUrl, {
             method: 'PUT',
-            headers: {
-                authorization: apiConfig.token,
-                'Content-Type': 'application/json'
-            }
+            headers: apiConfig.headers
         })
-            .then(res => res.json())
+            .then(res => {
+                if (res.ok) {
+                return res.json();
+                } console.error('Ошибка при получении списка карточек с сервера:', error);
+            })
             .then(data => {
-                getLikes(cardToLike, data, apiConfig)
+                handleLikes(cardToLike, data, apiConfig);
+                console.log(data)
             })
     } else {
         return fetch(targetUrl, {
             method: 'DELETE',
-            headers: {
-                authorization: apiConfig.token,
-                'Content-Type': 'application/json'
-            }
+            headers: apiConfig.headers
         })
-            .then(res => res.json())
+            .then(res => {
+                if (res.ok) {
+                return res.json();
+                } console.error('Ошибка при получении списка карточек с сервера:', error);
+            })
             .then(data => {
-                getLikes(cardToLike, data, apiConfig)  
+                handleLikes(cardToLike, data, apiConfig)  
             })
     }
 }
 
-// Изменение аватара
-export function changeAvatarOnServer(profileAvatar, apiConfig) {
-    const targetUrl = apiConfig.baseUrl + apiConfig.uriUsers + apiConfig.uriMe + apiConfig.uriAvatar;
+// Отображение данных профиля
+export function handleProfileData(apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriUsers + apiConfig.uriMe;
     return fetch(targetUrl, {
-        method: 'PATCH',
-        headers: {
-            authorization: apiConfig.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-            avatar: profileAvatar
-        })
+        method: 'GET',
+        headers: apiConfig.headers
     })
-        .then(res => res.json())
+    .then(res => {
+        if (res.ok) {
+        return res.json();
+        } console.error('Ошибка при получении данных профиля с сервера:', error);
+    })
         .catch(error => {
-            console.error('Ошибка при изменении аватара:', error);
+            console.error('Ошибка при отображении данных профиля:', error);
         });
 }
 
@@ -131,30 +143,38 @@ export function changeProfileData(profileName, profileDescription, apiConfig) {
     const targetUrl = apiConfig.baseUrl + apiConfig.uriUsers + apiConfig.uriMe;
     return fetch(targetUrl, {
         method: 'PATCH',
-        headers: {
-            authorization: apiConfig.token,
-            'Content-Type': 'application/json'
-        },
+        headers: apiConfig.headers,
         body: JSON.stringify({
             name: profileName,
             about: profileDescription
         })
     })
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+            return res.json();
+            } console.error('Ошибка при изменении данных профиля на сервере:', error);
+        })
         .catch(error => {
-            console.error('Ошибка при изменении данных пользователя:', error);
+            console.error('Ошибка при изменении данных профиля на сервере:', error);
         });
 }
 
-// Отображение данных профиля
-export function handleProfileData(apiConfig) {
-    const targetUrl = apiConfig.baseUrl + apiConfig.uriUsers + apiConfig.uriMe;
+// Изменение аватара
+export function changeProfileAvatar(profileAvatar, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriUsers + apiConfig.uriMe + apiConfig.uriAvatar;
     return fetch(targetUrl, {
-        method: 'GET',
-        headers: {
-            authorization: apiConfig.token,
-            'Content-Type': 'application/json'
-        }
+        method: 'PATCH',
+        headers: apiConfig.headers,
+        body: JSON.stringify({ 
+            avatar: profileAvatar
+        })
     })
-    .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+            return res.json();
+            } console.error('Ошибка при изменении аватара на сервере:', error);
+        })
+        .catch(error => {
+            console.error('Ошибка при изменении аватара на сервере:', error);
+        });
 }

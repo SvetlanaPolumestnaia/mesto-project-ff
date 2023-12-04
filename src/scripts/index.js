@@ -32,18 +32,18 @@ import { modals,
          apiConfiguration,
          } from './constants.js';
 import { createCard, 
-         getLikes, 
+         handleLikes, 
          showDeleteButton} from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
 import { enableValidation, 
          clearValidation } from './validation.js';
 import { changeProfileData,
-         addCard, 
+         addCardToServer, 
          getInitialCards, 
          deleteCardFromServer,
-         handleLike,
-         changeAvatarOnServer,
+         toggleLikeCard,
+         changeProfileAvatar,
          handleProfileData} from './api.js';
 
 // Функция добавления новой карточки на страницу
@@ -56,35 +56,40 @@ getInitialCards(apiConfiguration)
     .then((results) => {
         const cards = results[1];
         cards.forEach((data) => {
-            const newCard = createCard(data.link, data.name, data.name, deleteCardFromServer, handleLike, openModalImage);
+            const newCard = createCard(data.link, data.name, data.name, deleteCardFromServer, toggleLikeCard, openModalImage);
             renderCard(newCard, placesList);
         
             newCard.id = data._id;
             newCard.dataset.likes = data.likes.length;
             newCard.dataset.ownerId = data.owner._id;
         
-            getLikes(newCard, data);
+            handleLikes(newCard, data, apiConfiguration);
 
             showDeleteButton(newCard, apiConfiguration);
     });
 })
 
-// Отображение профиля
+// Отображение данных профиля
 handleProfileData(apiConfiguration)
     .then(data => {
         profileTitle.textContent = data.name;
         profileDescription.textContent = data.about;
         profileAvatar.style.backgroundImage = `url('${data.avatar}')`
     })
+    .catch(error => {
+        console.error('Ошибка при добавлении данных профиля с сервера:', error)
+    })
 
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
     evt.preventDefault();
+    buttonSaveProfile.textContent = 'Сохранение...'
     if (nameInput.validity.valid && jobInput.validity.valid) {
         changeProfileData(nameInput.value, jobInput.value, apiConfiguration)
         profileTitle.textContent = nameInput.value;
         profileDescription.textContent = jobInput.value;
     }
+    buttonSaveProfile.textContent = 'Сохранить'
 }
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
@@ -92,28 +97,34 @@ formEditProfile.addEventListener('submit', handleFormEditProfile);
 // Добавление новой карточки пользователем
 function handleFormAddNewCard(evt) {
     evt.preventDefault();
+    buttonSaveNewCard.textContent = 'Сохранение...'
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
-        addCard(placeNameInput.value, urlInput.value, deleteCardFromServer, handleLike, openModalImage, apiConfiguration)
+        addCardToServer(placeNameInput.value, urlInput.value, deleteCardFromServer, toggleLikeCard, openModalImage, apiConfiguration)
     }
+    buttonSaveNewCard.textContent = 'Сохранить'
 };
-
 
 formNewCard.addEventListener('submit', handleFormAddNewCard);
 
 // Изменение аватара
 function handleFromEditAvatar(evt) {
     evt.preventDefault();
+    buttonSaveAvatar.textContent = 'Сохранение...'
     if (avatarInput.validity.valid) {
-        changeAvatarOnServer(avatarInput.value, apiConfiguration)
+        changeProfileAvatar(avatarInput.value, apiConfiguration)
             .then(data => {
                 profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
+            })
+            .catch(error => {
+                console.error('Ошибка при изменении аватара:', error);
+            })
+            .finally(() => {
+                buttonSaveAvatar.textContent = 'Сохранить';
             })
     }
 }
 
 formEditAvatar.addEventListener('submit', handleFromEditAvatar)
-
-
 
 // Работа с открытием и закрытием модульных окон
 // Открытие модульного окна с картинкой
@@ -122,6 +133,7 @@ export function openModalImage(evt) {
     modalImageImg.src = evt.target.src;
     modalImageCaption.textContent = evt.target.alt;
     modalImageImg.alt = evt.target.alt;
+    // По фигме при открытии картинки фон затемнения отличается от стандратного
     modalImage.style.backgroundColor =  'rgba(0, 0, 0, .9)';
 
     openModal(modalImage);    
@@ -200,6 +212,4 @@ export function handleEsc(evt) {
 };
 
 // Валидация
-  
 enableValidation(validationConfiguration);
-

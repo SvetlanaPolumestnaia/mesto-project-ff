@@ -17,7 +17,6 @@ export const buttonCloseAvatar = modalEditAvatar.querySelector('.popup__close');
 export const modalImage = document.querySelector('.popup_type_image');
 export const modalImageImg = document.querySelector('.popup__image');
 export const modalImageCaption = document.querySelector('.popup__caption');
-
 export const buttonCloseImage = modalImage.querySelector('.popup__close');
 export const formEditProfile = modalEditProfile.querySelector('.popup__form');
 export const nameInput = modalEditProfile.querySelector('.popup__input_type_name');
@@ -40,11 +39,12 @@ export const validationConfiguration = {
   errorClass: 'popup__error_visible'
 }
 
-export const myId = 'f19ca1805b28867f6c3451ec';
-
 export const apiConfiguration = {
   myId: 'f19ca1805b28867f6c3451ec',
-  token: 'a3a5f573-877f-4323-8cbf-b12cc816b747',
+  headers: {
+    authorization: 'a3a5f573-877f-4323-8cbf-b12cc816b747',
+    'Content-Type': 'application/json'
+  },
   baseUrl: 'https://nomoreparties.co/v1/wff-cohort-1',
   uriCards: '/cards',
   uriUsers: '/users',
