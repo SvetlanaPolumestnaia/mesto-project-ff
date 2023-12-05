@@ -103,7 +103,6 @@ export function toggleLikeCard(evt, apiConfig) {
             })
             .then(data => {
                 handleLikes(cardToLike, data, apiConfig);
-                console.log(data)
             })
     } else {
         return fetch(targetUrl, {
