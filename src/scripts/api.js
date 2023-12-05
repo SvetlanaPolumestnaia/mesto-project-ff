@@ -1,6 +1,15 @@
 import { placesList } from "./constants";
 import { createCard, handleLikes, showDeleteButton } from "./cards";
 
+// Функция обработки ответа от сервера
+function getResponseData(res) {
+    if (!res.ok) {
+        return Promise.reject(`Ошибка: ${res.status}`); 
+    }
+    return res.json();
+} 
+
+
 // Отображение текущих карточек
 export function getInitialCards(apiConfig) {
     const targetUrlUsers = apiConfig.baseUrl + apiConfig.uriUsers;
@@ -45,9 +54,7 @@ export function addCardToServer(cardName, cardLink, deleteFn, likeFn, openFn, ap
             link: cardLink }),
     })
     .then(res => {
-        if (res.ok) {
-        return res.json();
-        } console.error('Ошибка при добавлении данных на сервер:', error);
+        getResponseData(res)
     })
     .then(data => {
         const cardElement = createCard(cardLink, cardName, cardName, deleteFn, likeFn, openFn);
@@ -69,20 +76,18 @@ export function addCardToServer(cardName, cardLink, deleteFn, likeFn, openFn, ap
 }
 
 // Удаление своей карточки с сервера
-export function deleteCardFromServer(evt, apiConfig) {
-    const cardToDelete = evt.target.closest('.places__item');
-
-    if (cardToDelete.dataset.ownerId === apiConfig.myId) {
-        cardToDelete.remove();
-        const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + '/' + cardToDelete.id;
-        return fetch(targetUrl, {
-            method: 'DELETE',
-            headers: apiConfig.headers
+export function deleteCardFromServer(card, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + '/' + card.id;
+    return fetch(targetUrl, {
+        method: 'DELETE',
+        headers: apiConfig.headers
+    })
+        .then(res => {
+            getResponseData(res)
         })
-            .catch(error => {
-                console.error('Ошибка при удалении карточки:', error);
-            })
-    }
+        .catch(error => {
+            console.error('Ошибка при удалении карточки:', error);
+        })
 }
 
 // Добавление, удаление лайков
@@ -97,9 +102,7 @@ export function toggleLikeCard(evt, apiConfig) {
             headers: apiConfig.headers
         })
             .then(res => {
-                if (res.ok) {
-                return res.json();
-                } console.error('Ошибка при получении списка карточек с сервера:', error);
+                getResponseData(res);
             })
             .then(data => {
                 handleLikes(cardToLike, data, apiConfig);
@@ -110,9 +113,7 @@ export function toggleLikeCard(evt, apiConfig) {
             headers: apiConfig.headers
         })
             .then(res => {
-                if (res.ok) {
-                return res.json();
-                } console.error('Ошибка при получении списка карточек с сервера:', error);
+                getResponseData(res);
             })
             .then(data => {
                 handleLikes(cardToLike, data, apiConfig);
@@ -177,3 +178,4 @@ export function changeProfileAvatar(profileAvatar, apiConfig) {
             console.error('Ошибка при изменении аватара на сервере:', error);
         });
 }
+

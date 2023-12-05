@@ -1,3 +1,4 @@
+import { deleteCardFromServer } from "./api.js";
 import { cardTemplate, apiConfiguration } from "./constants.js";
 
 // Функция создания новой карточки
@@ -54,4 +55,14 @@ export function handleLikes(card, data, apiConfig) {
     } else {
       buttonLike.classList.remove('card__like-button_is-active');
     }
+}
+
+
+// Удаление карточки
+export function deleteCard(evt, apiConfig) {
+  const cardToDelete = evt.target.closest('.places__item');
+  if (cardToDelete.dataset.ownerId === apiConfig.myId) {
+    cardToDelete.remove();
+    deleteCardFromServer(cardToDelete, apiConfig);
+  }
 }

@@ -32,7 +32,8 @@ import { modals,
          apiConfiguration } from './constants.js';
 import { createCard, 
          handleLikes, 
-         showDeleteButton } from './cards.js';
+         showDeleteButton,
+         deleteCard } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
 import { enableValidation, 
@@ -55,7 +56,7 @@ getInitialCards(apiConfiguration)
     .then((results) => {
         const cards = results[1];
         cards.forEach((data) => {
-            const newCard = createCard(data.link, data.name, data.name, deleteCardFromServer, toggleLikeCard, openModalImage);
+            const newCard = createCard(data.link, data.name, data.name, deleteCard, toggleLikeCard, openModalImage);
             renderCard(newCard, placesList);
         
             newCard.id = data._id;
@@ -98,7 +99,7 @@ function handleFormAddNewCard(evt) {
     evt.preventDefault();
     buttonSaveNewCard.textContent = 'Сохранение...';
     if (placeNameInput.validity.valid && urlInput.validity.valid) {
-        addCardToServer(placeNameInput.value, urlInput.value, deleteCardFromServer, toggleLikeCard, openModalImage, apiConfiguration)
+        addCardToServer(placeNameInput.value, urlInput.value, deleteCard, toggleLikeCard, openModalImage, apiConfiguration)
     }
     buttonSaveNewCard.textContent = 'Сохранить';
 };
