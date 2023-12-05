@@ -31,7 +31,7 @@ import { modals,
          validationConfiguration,
          apiConfiguration } from './constants.js';
 import { createCard, 
-         handleLikes, 
+         likeCard, 
          showDeleteButton,
          deleteCard } from './cards.js';
 import { openModal, 
@@ -40,32 +40,19 @@ import { enableValidation,
          clearValidation } from './validation.js';
 import { changeProfileData,
          addCardToServer, 
-         getInitialCards, 
+         getInitialData, 
          deleteCardFromServer,
          toggleLikeCard,
          changeProfileAvatar,
          handleProfileData } from './api.js';
 
-// Функция добавления новой карточки на страницу
-function renderCard(cardData, container) {
-    container.append(cardData);
-  };
-
 // Добавление существующих на сервере карточек
-getInitialCards(apiConfiguration)
+getInitialData(apiConfiguration)
     .then((results) => {
         const cards = results[1];
         cards.forEach((data) => {
-            const newCard = createCard(data.link, data.name, data.name, deleteCard, toggleLikeCard, openModalImage);
-            renderCard(newCard, placesList);
-        
-            newCard.id = data._id;
-            newCard.dataset.likes = data.likes.length;
-            newCard.dataset.ownerId = data.owner._id;
-        
-            handleLikes(newCard, data, apiConfiguration);
-
-            showDeleteButton(newCard, apiConfiguration);
+            const newCard = createCard(data.link, data.name, data.name, deleteCard, likeCard, openModalImage, data, apiConfiguration);
+            placesList.append(newCard);
     });
 })
 
@@ -95,16 +82,23 @@ function handleFormEditProfile(evt) {
 formEditProfile.addEventListener('submit', handleFormEditProfile);
 
 // Добавление новой карточки пользователем
-function handleFormAddNewCard(evt) {
+function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, apiConfig) {
     evt.preventDefault();
     buttonSaveNewCard.textContent = 'Сохранение...';
-    if (placeNameInput.validity.valid && urlInput.validity.valid) {
-        addCardToServer(placeNameInput.value, urlInput.value, deleteCard, toggleLikeCard, openModalImage, apiConfiguration)
-    }
+    addCardToServer(link, name, apiConfig)
+        .then(data => {
+            const newCard = createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiConfig);
+            placesList.prepend(newCard);
+        })
+        .catch(error => {
+            console.error('Ошибка при создании карточки:', error);
+        });
     buttonSaveNewCard.textContent = 'Сохранить';
 };
 
-formNewCard.addEventListener('submit', handleFormAddNewCard);
+formNewCard.addEventListener('submit', (evt) => {
+    handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration)
+});
 
 // Изменение аватара
 function handleFromEditAvatar(evt) {

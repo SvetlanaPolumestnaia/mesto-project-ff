@@ -11,7 +11,7 @@ function getResponseData(res) {
 
 
 // Отображение текущих карточек
-export function getInitialCards(apiConfig) {
+export function getInitialData(apiConfig) {
     const targetUrlUsers = apiConfig.baseUrl + apiConfig.uriUsers;
     const usersList = fetch(targetUrlUsers, {
         headers: apiConfig.headers
@@ -20,7 +20,7 @@ export function getInitialCards(apiConfig) {
             if (res.ok) {
               return res.json();
             } console.error('Ошибка при получении списка пользователей с сервера:', error);
-        })      
+        })
 
     const targetUrlCards = apiConfig.baseUrl + apiConfig.uriCards;
     const cardsList = fetch(targetUrlCards, {
@@ -44,35 +44,18 @@ export function getInitialCards(apiConfig) {
     }
 
 // Добавление новой карточки на сервер
-export function addCardToServer(cardName, cardLink, deleteFn, likeFn, openFn, apiConfig) {
+export function addCardToServer(link, name, apiConfig) {
     const targetUrl = apiConfig.baseUrl + apiConfig.uriCards
     fetch(targetUrl, {
         method: 'POST',
         headers: apiConfig.headers,
         body: JSON.stringify({
-            name: cardName,
-            link: cardLink }),
+            name: name,
+            link: link }),
     })
     .then(res => {
         getResponseData(res)
     })
-    .then(data => {
-        const cardElement = createCard(cardLink, cardName, cardName, deleteFn, likeFn, openFn);
-        placesList.prepend(cardElement);
-
-        //Добавление серверных данных в дата-атрибуты
-        cardElement.id = data._id;
-        cardElement.dataset.likes = data.likes.length;
-        cardElement.dataset.ownerId = data.owner._id;
-
-        // Чтобы при добавлении новой карточки показывалась кнопка удаления
-        showDeleteButton(cardElement, apiConfig);
-        // Чтобы при добавлении новой карточки показывалось количество лайков
-        handleLikes(cardElement, data, apiConfig);
-    })
-    .catch(error => {
-        console.error('Ошибка при создании карточки:', error);
-    });
 }
 
 // Удаление своей карточки с сервера
@@ -84,9 +67,6 @@ export function deleteCardFromServer(card, apiConfig) {
     })
         .then(res => {
             getResponseData(res)
-        })
-        .catch(error => {
-            console.error('Ошибка при удалении карточки:', error);
         })
 }
 
@@ -104,9 +84,6 @@ export function toggleLikeCard(evt, apiConfig) {
             .then(res => {
                 getResponseData(res);
             })
-            .then(data => {
-                handleLikes(cardToLike, data, apiConfig);
-            })
     } else {
         return fetch(targetUrl, {
             method: 'DELETE',
@@ -115,10 +92,43 @@ export function toggleLikeCard(evt, apiConfig) {
             .then(res => {
                 getResponseData(res);
             })
-            .then(data => {
-                handleLikes(cardToLike, data, apiConfig);
-            })
     }
+}
+
+// Добавление лайка на сервере
+export function addLikeToServer(card, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + apiConfig.uriLikes + '/' + card.id;
+    return fetch(targetUrl, {
+        method: 'PUT',
+        headers: apiConfig.headers
+    })
+        .then(res => {
+            getResponseData(res);
+        })
+}
+
+// Удаление лайка с сервера
+export function deleteLikeFromServer(card, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + apiConfig.uriLikes + '/' + card.id;
+    return fetch(targetUrl, {
+        method: 'DELETE',
+        headers: apiConfig.headers
+    })
+        .then(res => {
+            getResponseData(res);
+        })
+}
+
+// Получение информации о количестве лайков
+export function getLikes(card, apiConfig) {
+    const targetUrl = apiConfig.baseUrl + apiConfig.uriCards + apiConfig.uriLikes + '/' + card.id;
+    return fetch(targetUrl, {
+        method: 'GET',
+        headers: apiConfig.headers
+    })
+        .then(res => {
+            getResponseData(res);
+        })
 }
 
 // Отображение данных профиля
