@@ -46,21 +46,21 @@ import { changeProfileData,
 // Добавление данных при загрузке страницы
 getInitialData(apiConfiguration)
     .then((results) => {
-        const [ users, cards ] = results;
+            const [ users, cards ] = results;
 
-        const myProfile = users.find(user => user._id === apiConfiguration.myId);
-        profileTitle.textContent = myProfile.name;
-        profileDescription.textContent = myProfile.about;
-        profileAvatar.style.backgroundImage = `url('${myProfile.avatar}')`;
+            const myProfile = users.find(user => user._id === apiConfiguration.myId);
+            profileTitle.textContent = myProfile.name;
+            profileDescription.textContent = myProfile.about;
+            profileAvatar.style.backgroundImage = `url('${myProfile.avatar}')`;
 
-        cards.forEach((card) => {
-            const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage, card, apiConfiguration);
-            placesList.append(newCard);
-    })
-        .catch(error => {
-            console.error('Ошибка при отображени данных с сервера:', error);
+            cards.forEach((card) => {
+                const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage, card, apiConfiguration);
+                placesList.append(newCard);
         })
-})
+    })
+    .catch(error => {
+        console.error('Ошибка при отображени данных с сервера:', error);
+    })
 
 // Добавление новой карточки пользователем
 function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, apiConfig) {
