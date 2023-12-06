@@ -32,7 +32,6 @@ import { modals,
          apiConfiguration } from './constants.js';
 import { createCard, 
          likeCard, 
-         showDeleteButton,
          deleteCard } from './cards.js';
 import { openModal, 
          closeModal } from './modals.js';
@@ -41,45 +40,23 @@ import { enableValidation,
 import { changeProfileData,
          addCardToServer, 
          getInitialData, 
-         deleteCardFromServer,
-         toggleLikeCard,
-         changeProfileAvatar,
-         handleProfileData } from './api.js';
+         changeProfileAvatar } from './api.js';
 
-// Добавление существующих на сервере карточек
+// Добавление данных при загрузке страницы
 getInitialData(apiConfiguration)
     .then((results) => {
-        const cards = results[1];
-        cards.forEach((data) => {
-            const newCard = createCard(data.link, data.name, data.name, deleteCard, likeCard, openModalImage, data, apiConfiguration);
+        const [ users, cards ] = results;
+
+        const myProfile = users.find(user => user._id === apiConfiguration.myId);
+        profileTitle.textContent = myProfile.name;
+        profileDescription.textContent = myProfile.about;
+        profileAvatar.style.backgroundImage = `url('${myProfile.avatar}')`;
+
+        cards.forEach((card) => {
+            const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage, card, apiConfiguration);
             placesList.append(newCard);
-    });
+    })
 })
-
-// Отображение данных профиля
-handleProfileData(apiConfiguration)
-    .then(data => {
-        profileTitle.textContent = data.name;
-        profileDescription.textContent = data.about;
-        profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
-    })
-    .catch(error => {
-        console.error('Ошибка при добавлении данных профиля с сервера:', error)
-    })
-
-// Редактирование профиля
-function handleFormEditProfile(evt) {        
-    evt.preventDefault();
-    buttonSaveProfile.textContent = 'Сохранение...'
-    if (nameInput.validity.valid && jobInput.validity.valid) {
-        changeProfileData(nameInput.value, jobInput.value, apiConfiguration)
-        profileTitle.textContent = nameInput.value;
-        profileDescription.textContent = jobInput.value;
-    }
-    buttonSaveProfile.textContent = 'Сохранить'
-}
-
-formEditProfile.addEventListener('submit', handleFormEditProfile);
 
 // Добавление новой карточки пользователем
 function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, apiConfig) {
@@ -87,7 +64,6 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
     buttonSaveNewCard.textContent = 'Сохранение...';
     addCardToServer(link, name, apiConfig)
         .then(data => {
-            console.log(data)
             const newCard = createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiConfig);
             placesList.prepend(newCard);
         })
@@ -100,6 +76,24 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
 formNewCard.addEventListener('submit', (evt) => {
     handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration)
 });
+
+
+
+// Редактирование профиля
+function handleFormEditProfile(evt) {        
+    evt.preventDefault();
+    buttonSaveProfile.textContent = 'Сохранение...'
+    changeProfileData(nameInput.value, jobInput.value, apiConfiguration)
+        .catch(error => {
+            console.error('Ошибка при изменении данных профиля на сервере:', error);
+        });
+    profileTitle.textContent = nameInput.value;
+    profileDescription.textContent = jobInput.value;
+
+    buttonSaveProfile.textContent = 'Сохранить'
+}
+
+formEditProfile.addEventListener('submit', handleFormEditProfile);
 
 // Изменение аватара
 function handleFromEditAvatar(evt) {
