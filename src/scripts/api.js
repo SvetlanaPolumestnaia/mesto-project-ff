@@ -46,16 +46,16 @@ export function getInitialData(apiConfig) {
 // Добавление новой карточки на сервер
 export function addCardToServer(link, name, apiConfig) {
     const targetUrl = apiConfig.baseUrl + apiConfig.uriCards
-    fetch(targetUrl, {
+    return fetch(targetUrl, {
         method: 'POST',
         headers: apiConfig.headers,
         body: JSON.stringify({
             name: name,
             link: link }),
     })
-    .then(res => {
-        getResponseData(res)
-    })
+    .then(
+        getResponseData
+    )
 }
 
 // Удаление своей карточки с сервера

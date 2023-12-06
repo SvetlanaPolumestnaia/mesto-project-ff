@@ -87,6 +87,7 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
     buttonSaveNewCard.textContent = 'Сохранение...';
     addCardToServer(link, name, apiConfig)
         .then(data => {
+            console.log(data)
             const newCard = createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiConfig);
             placesList.prepend(newCard);
         })
