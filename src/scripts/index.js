@@ -34,7 +34,8 @@ import { createCard,
          likeCard, 
          deleteCard } from './cards.js';
 import { openModal, 
-         closeModal } from './modals.js';
+         closeModal, 
+         closeModalOverlay} from './modals.js';
 import { enableValidation, 
          clearValidation } from './validation.js';
 import { changeProfileData,
@@ -56,6 +57,9 @@ getInitialData(apiConfiguration)
             const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage, card, apiConfiguration);
             placesList.append(newCard);
     })
+        .catch(error => {
+            console.error('Ошибка при отображени данных с сервера:', error);
+        })
 })
 
 // Добавление новой карточки пользователем
@@ -69,51 +73,60 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
         })
         .catch(error => {
             console.error('Ошибка при создании карточки:', error);
-        });
-    buttonSaveNewCard.textContent = 'Сохранить';
+        })
+        .finally(() => {
+            buttonSaveNewCard.textContent = 'Сохранить';
+        })
+    
 };
 
 formNewCard.addEventListener('submit', (evt) => {
-    handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration)
+    handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration);
+    closeModal(modalAddNewCard);
 });
-
-
 
 // Редактирование профиля
 function handleFormEditProfile(evt) {        
     evt.preventDefault();
     buttonSaveProfile.textContent = 'Сохранение...'
     changeProfileData(nameInput.value, jobInput.value, apiConfiguration)
+        .then(() => {
+            profileTitle.textContent = nameInput.value;
+            profileDescription.textContent = jobInput.value;
+        })
         .catch(error => {
-            console.error('Ошибка при изменении данных профиля на сервере:', error);
-        });
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-
-    buttonSaveProfile.textContent = 'Сохранить'
+            console.error('Ошибка при изменении данных профиля:', error);
+        })
+        .finally(() => {
+            buttonSaveProfile.textContent = 'Сохранить'
+        })
 }
 
-formEditProfile.addEventListener('submit', handleFormEditProfile);
+formEditProfile.addEventListener('submit', (evt) => {
+    handleFormEditProfile(evt);
+    closeModal(modalEditProfile);
+});
 
 // Изменение аватара
 function handleFromEditAvatar(evt) {
     evt.preventDefault();
     buttonSaveAvatar.textContent = 'Сохранение...';
-    if (avatarInput.validity.valid) {
-        changeProfileAvatar(avatarInput.value, apiConfiguration)
-            .then(data => {
-                profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
-            })
-            .catch(error => {
-                console.error('Ошибка при изменении аватара:', error);
-            })
-            .finally(() => {
-                buttonSaveAvatar.textContent = 'Сохранить';
-            })
-    }
+    changeProfileAvatar(avatarInput.value, apiConfiguration)
+        .then(data => {
+            profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
+        })
+        .catch(error => {
+            console.error('Ошибка при изменении аватара:', error);
+        })
+        .finally(() => {
+            buttonSaveAvatar.textContent = 'Сохранить';
+        })
 }
 
-formEditAvatar.addEventListener('submit', handleFromEditAvatar)
+formEditAvatar.addEventListener('submit', (evt) => {
+    handleFromEditAvatar(evt);
+    closeModal(modalEditAvatar);
+})
 
 // Работа с открытием и закрытием модульных окон
 // Открытие модульного окна с картинкой
@@ -133,34 +146,34 @@ modals.forEach((modal) => {
     modal.classList.add('popup_is-animated');
 })
 
-// Открытие модальных окон по кнопкам
+// Открытие модальных окон
+buttonAddNewCard.addEventListener('click', () => {
+    openModal(modalAddNewCard);
+    clearValidation(formNewCard, validationConfiguration);
+    formNewCard.reset();
+});
+
 buttonEditProfile.addEventListener('click', () => {
     openModal(modalEditProfile);
-    clearValidation(modalEditProfile, validationConfiguration);
+    clearValidation(formEditProfile, validationConfiguration);
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
 });
 
-buttonAddNewCard.addEventListener('click', () => {
-    openModal(modalAddNewCard);
-    clearValidation(modalAddNewCard, validationConfiguration);
-    formNewCard.reset();
-});
-
 buttonEditAvatar.addEventListener('click', () => {
     openModal(modalEditAvatar);
-    clearValidation(modalEditAvatar, validationConfiguration);
+    clearValidation(formEditAvatar, validationConfiguration);
     formEditAvatar.reset();
 })
 
 // Закрытие модальных окон
 // По крестику
-buttonCloseProfile.addEventListener('click', () => {
-    closeModal(modalEditProfile);
-});
-
 buttonCloseNewCard.addEventListener('click', () => {
     closeModal(modalAddNewCard);
+});
+
+buttonCloseProfile.addEventListener('click', () => {
+    closeModal(modalEditProfile);
 });
 
 buttonCloseAvatar.addEventListener('click', () => {
@@ -171,34 +184,22 @@ buttonCloseImage.addEventListener('click', () => {
     closeModal(modalImage);
 });
 
-// По кнопке Сохранить
-buttonSaveProfile.addEventListener('click', () => {
-    closeModal(modalEditProfile);
-});
-
-buttonSaveNewCard.addEventListener('click', () => {
-    closeModal(modalAddNewCard);
-});
-
-buttonSaveAvatar.addEventListener('click', () => {
-    closeModal(modalEditAvatar);
-})
-
 // По оверлею
-modals.forEach((modal) => {
-   modal.addEventListener('click', (evt) => {
-        if (evt.target === evt.currentTarget) {
-            closeModal(modal);
-        }
-    })
-})
+modalAddNewCard.addEventListener('click', (evt) => {
+    closeModalOverlay(evt, modalAddNewCard);
+}); 
 
-// По кнопке Escape
-export function handleEsc(evt) {
-    if (evt.key === 'Escape') {
-        modals.forEach((modal) => closeModal(modal));
-    }
-};
+modalEditProfile.addEventListener('click', (evt) => {
+    closeModalOverlay(evt, modalEditProfile);
+});
+
+modalEditAvatar.addEventListener('click', (evt) => {
+    closeModalOverlay(evt, modalEditAvatar);
+});
+
+modalImage.addEventListener('click', (evt) => {
+    closeModalOverlay(evt, modalImage);
+});
 
 // Валидация
 enableValidation(validationConfiguration);
