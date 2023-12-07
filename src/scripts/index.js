@@ -70,6 +70,7 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
         .then(data => {
             const newCard = createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiConfig);
             placesList.prepend(newCard);
+            closeModal(modalAddNewCard);
         })
         .catch(error => {
             console.error('Ошибка при создании карточки:', error);
@@ -82,7 +83,6 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
 
 formNewCard.addEventListener('submit', (evt) => {
     handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration);
-    closeModal(modalAddNewCard);
 });
 
 // Редактирование профиля
@@ -93,6 +93,7 @@ function handleFormEditProfile(evt) {
         .then(() => {
             profileTitle.textContent = nameInput.value;
             profileDescription.textContent = jobInput.value;
+            closeModal(modalEditProfile);
         })
         .catch(error => {
             console.error('Ошибка при изменении данных профиля:', error);
@@ -104,7 +105,6 @@ function handleFormEditProfile(evt) {
 
 formEditProfile.addEventListener('submit', (evt) => {
     handleFormEditProfile(evt);
-    closeModal(modalEditProfile);
 });
 
 // Изменение аватара
@@ -114,6 +114,7 @@ function handleFromEditAvatar(evt) {
     changeProfileAvatar(avatarInput.value, apiConfiguration)
         .then(data => {
             profileAvatar.style.backgroundImage = `url('${data.avatar}')`;
+            closeModal(modalEditAvatar);
         })
         .catch(error => {
             console.error('Ошибка при изменении аватара:', error);
@@ -125,7 +126,6 @@ function handleFromEditAvatar(evt) {
 
 formEditAvatar.addEventListener('submit', (evt) => {
     handleFromEditAvatar(evt);
-    closeModal(modalEditAvatar);
 })
 
 // Работа с открытием и закрытием модульных окон
@@ -148,22 +148,22 @@ modals.forEach((modal) => {
 
 // Открытие модальных окон
 buttonAddNewCard.addEventListener('click', () => {
-    openModal(modalAddNewCard);
-    clearValidation(formNewCard, validationConfiguration);
     formNewCard.reset();
+    clearValidation(formNewCard, validationConfiguration);
+    openModal(modalAddNewCard);
 });
 
 buttonEditProfile.addEventListener('click', () => {
-    openModal(modalEditProfile);
     clearValidation(formEditProfile, validationConfiguration);
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
+    openModal(modalEditProfile);
 });
 
 buttonEditAvatar.addEventListener('click', () => {
-    openModal(modalEditAvatar);
-    clearValidation(formEditAvatar, validationConfiguration);
     formEditAvatar.reset();
+    clearValidation(formEditAvatar, validationConfiguration);
+    openModal(modalEditAvatar);
 })
 
 // Закрытие модальных окон
@@ -185,21 +185,15 @@ buttonCloseImage.addEventListener('click', () => {
 });
 
 // По оверлею
-modalAddNewCard.addEventListener('click', (evt) => {
-    closeModalOverlay(evt, modalAddNewCard);
-}); 
+modalAddNewCard.addEventListener('click', closeModalOverlay); 
 
-modalEditProfile.addEventListener('click', (evt) => {
-    closeModalOverlay(evt, modalEditProfile);
-});
+modalEditProfile.addEventListener('click', closeModalOverlay);
 
-modalEditAvatar.addEventListener('click', (evt) => {
-    closeModalOverlay(evt, modalEditAvatar);
-});
+modalEditAvatar.addEventListener('click', closeModalOverlay);
 
-modalImage.addEventListener('click', (evt) => {
-    closeModalOverlay(evt, modalImage);
-});
+modalImage.addEventListener('click', closeModalOverlay);
 
 // Валидация
 enableValidation(validationConfiguration);
+
+// Спасибо за ревью! С наступающим новым годом ^^

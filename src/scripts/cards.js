@@ -22,25 +22,25 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiC
   buttonImage.addEventListener('click', openFn);
 
   buttonDeleteCard.addEventListener('click', (evt) => {
-    deleteFn(evt, apiConfig);
-  })
+        deleteFn(evt, apiConfig);
+      })
   if (cardElementCopy.dataset.ownerId === apiConfig.myId) {
-    buttonDeleteCard.classList.add('card__delete-button_visible');
-  } else {
-    buttonDeleteCard.classList.remove('card__delete-button_visible');
-  }
+        buttonDeleteCard.classList.add('card__delete-button_visible');
+      } else {
+        buttonDeleteCard.classList.remove('card__delete-button_visible');
+    }
 
   buttonLikeCard.addEventListener('click', (evt) => {
-    likeFn(evt, apiConfig);
-  });
+      likeFn(evt, apiConfig);
+    });
 
   likeElement.textContent = data.likes.length;
   const likesList = Array.from(data.likes);
   const isLike = likesList.some((id => id._id === apiConfig.myId));
   if (isLike) {
-    buttonLikeCard.classList.add('card__like-button_is-active');
-  } else {
-    buttonLikeCard.classList.remove('card__like-button_is-active');
+      buttonLikeCard.classList.add('card__like-button_is-active');
+    } else {
+      buttonLikeCard.classList.remove('card__like-button_is-active');
   }
 
   return cardElementCopy;
@@ -50,8 +50,10 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiC
 export function deleteCard(evt, apiConfig) {
   const cardToDelete = evt.target.closest('.places__item');
   if (cardToDelete.dataset.ownerId === apiConfig.myId) {
-    cardToDelete.remove();
     deleteCardFromServer(cardToDelete, apiConfig)
+      .then(() => {
+        cardToDelete.remove();
+    })
       .catch(error => {
         console.error('Ошибка при удалении карточки:', error);
     });
@@ -68,19 +70,19 @@ export function likeCard(evt, apiConfig) {
     addLikeToServer(cardToLike, apiConfig)
       .then(data => {
         likeElement.textContent = data.likes.length;
+        buttonLike.classList.add('card__like-button_is-active');
       })
       .catch(error => {
         console.error('Ошибка при отображении лайка:', error);
     });
-    buttonLike.classList.add('card__like-button_is-active');
   } else {
     deleteLikeFromServer(cardToLike, apiConfig)
       .then(data => {
         likeElement.textContent = data.likes.length;
+        buttonLike.classList.remove('card__like-button_is-active');
       })
       .catch(error => {
         console.error('Ошибка при отображении лайка:', error);
     });
-    buttonLike.classList.remove('card__like-button_is-active');
   }
 }
