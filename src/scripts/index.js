@@ -6,6 +6,9 @@ import { modals,
          modalImage,
          modalImageImg,
          modalImageCaption,
+         modalDelete,
+         buttonDeleteYes,
+         buttonCloseDelete,
          buttonCloseImage,
          buttonEditProfile,
          buttonSaveProfile,
@@ -29,10 +32,13 @@ import { modals,
          formEditAvatar, 
          avatarInput,
          validationConfiguration,
-         apiConfiguration } from './constants.js';
+         apiConfiguration,
+          } from './constants.js';
 import { createCard, 
          likeCard, 
-         deleteCard } from './cards.js';
+         deleteCard,
+         deleteCardConfirmation,
+         cardToDelete } from './cards.js';
 import { openModal, 
          closeModal, 
          closeModalOverlay} from './modals.js';
@@ -54,7 +60,7 @@ getInitialData(apiConfiguration)
             profileAvatar.style.backgroundImage = `url('${myProfile.avatar}')`;
 
             cards.forEach((card) => {
-                const newCard = createCard(card.link, card.name, card.name, deleteCard, likeCard, openModalImage, card, apiConfiguration);
+                const newCard = createCard(card.link, card.name, card.name, deleteCardConfirmation, likeCard, openModalImage, card, apiConfiguration);
                 placesList.append(newCard);
         })
     })
@@ -82,7 +88,7 @@ function handleFormAddNewCard(evt, link, name, alt, deleteFn, likeFn, openFn, ap
 };
 
 formNewCard.addEventListener('submit', (evt) => {
-    handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCard, likeCard, openModalImage, apiConfiguration);
+    handleFormAddNewCard(evt, urlInput.value, placeNameInput.value, placeNameInput.value, deleteCardConfirmation, likeCard, openModalImage, apiConfiguration);
 });
 
 // Редактирование профиля
@@ -164,7 +170,8 @@ buttonEditAvatar.addEventListener('click', () => {
     formEditAvatar.reset();
     clearValidation(formEditAvatar, validationConfiguration);
     openModal(modalEditAvatar);
-})
+});
+
 
 // Закрытие модальных окон
 // По крестику
@@ -184,16 +191,23 @@ buttonCloseImage.addEventListener('click', () => {
     closeModal(modalImage);
 });
 
+buttonCloseDelete.addEventListener('click', () => {
+    closeModal(modalDelete);
+});
+
 // По оверлею
 modalAddNewCard.addEventListener('click', closeModalOverlay); 
-
 modalEditProfile.addEventListener('click', closeModalOverlay);
-
 modalEditAvatar.addEventListener('click', closeModalOverlay);
-
 modalImage.addEventListener('click', closeModalOverlay);
+modalDelete.addEventListener('click', closeModalOverlay);
 
 // Валидация
 enableValidation(validationConfiguration);
+
+// Слушатель события удаления
+buttonDeleteYes.addEventListener('click', () => {
+    deleteCard(cardToDelete, apiConfiguration);
+  });
 
 // Спасибо за ревью! С наступающим новым годом ^^

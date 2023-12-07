@@ -1,6 +1,8 @@
 import { deleteCardFromServer, addLikeToServer, deleteLikeFromServer } from "./api.js";
-import { cardTemplate } from "./constants.js";
+import { cardTemplate, modalDelete, } from "./constants.js";
+import { closeModal, openModal } from "./modals.js";
 
+export let cardToDelete = ``;
 // Функция создания новой карточки
 export function createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiConfig) { 
   const cardElementCopy = cardTemplate.querySelector('.places__item').cloneNode(true);
@@ -20,10 +22,11 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiC
   cardElementCopy.dataset.ownerId = data.owner._id;
 
   buttonImage.addEventListener('click', openFn);
-
+  
   buttonDeleteCard.addEventListener('click', (evt) => {
-        deleteFn(evt, apiConfig);
-      })
+    deleteFn(evt, apiConfig);
+  })
+
   if (cardElementCopy.dataset.ownerId === apiConfig.myId) {
         buttonDeleteCard.classList.add('card__delete-button_visible');
       } else {
@@ -42,21 +45,27 @@ export function createCard(link, name, alt, deleteFn, likeFn, openFn, data, apiC
     } else {
       buttonLikeCard.classList.remove('card__like-button_is-active');
   }
-
   return cardElementCopy;
 };
 
+
 // Удаление карточки
-export function deleteCard(evt, apiConfig) {
-  const cardToDelete = evt.target.closest('.places__item');
+export function deleteCard(card, apiConfig) {
+  deleteCardFromServer(card, apiConfig)
+    .then(() => {
+      closeModal(modalDelete);
+      card.remove();
+  })
+    .catch(error => {
+      console.error('Ошибка при удалении карточки:', error);
+  });
+}
+
+// Запрос на удаление карточки
+export function deleteCardConfirmation(evt, apiConfig) {
+  cardToDelete = evt.target.closest('.places__item');
   if (cardToDelete.dataset.ownerId === apiConfig.myId) {
-    deleteCardFromServer(cardToDelete, apiConfig)
-      .then(() => {
-        cardToDelete.remove();
-    })
-      .catch(error => {
-        console.error('Ошибка при удалении карточки:', error);
-    });
+    openModal(modalDelete); 
   }
 }
 
